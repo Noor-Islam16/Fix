@@ -1,43 +1,43 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 import ellipseImage from "../assets/images/Ellipse 34.jpg";
 import vectorImage from "../assets/images/Vector 60.jpg";
-import { Star, Plus } from "lucide-react";
+import { Star, Plus, Minus } from "lucide-react";
 
 const AddExperience = () => {
-  const [selectedStartMonth, setSelectedStartMonth] = useState("");
-  const [selectedStartYear, setSelectedStartYear] = useState("");
-  const [selectedEndMonth, setSelectedEndMonth] = useState("");
-  const [selectedEndYear, setSelectedEndYear] = useState("");
-  const [companyName, setCompanyName] = useState("");
-  const [jobTitle, setJobTitle] = useState("");
-  const [employmentType, setEmploymentType] = useState("");
-  const [selectedCountry, setSelectedCountry] = useState("");
-  const [keySkills, setKeySkills] = useState([]);
-  const [policy, setPolicy] = useState("");
-  const [currentlyWorking, setCurrentlyWorking] = useState("");
-  const [likeFeedback, setLikeFeedback] = useState("");
-  const [dislikeFeedback, setDislikeFeedback] = useState("");
-  const [experiences, setExperiences] = useState([]);
-  const [formData, setFormData] = useState({
-    companyName: "",
-    jobTitle: "",
-    employmentType: "",
-    selectedStartYear: "",
-  });
   const navigate = useNavigate();
-  const [ratings, setRatings] = useState({
-    "Overall Rating": 0,
-    "Work - Life Balance": 0,
-    "Salary Benefits": 0,
-    "Promotions & Appraisal": 0,
-    "Job Security": 0,
-    "Skill Development / Learning": 0,
-    "Work Satisfaction": 0,
-    "Company Culture": 0,
-  });
 
+  // State for managing multiple forms
+  const [forms, setForms] = useState([
+    {
+      id: 1,
+      selectedStartMonth: "",
+      selectedStartYear: "",
+      selectedEndMonth: "",
+      selectedEndYear: "",
+      companyName: "",
+      jobTitle: "",
+      employmentType: "",
+      selectedCountry: "",
+      keySkills: [],
+      policy: "",
+      currentlyWorking: "",
+      likeFeedback: "",
+      dislikeFeedback: "",
+      ratings: {
+        "Overall Rating": 0,
+        "Work - Life Balance": 0,
+        "Salary Benefits": 0,
+        "Promotions & Appraisal": 0,
+        "Job Security": 0,
+        "Skill Development / Learning": 0,
+        "Work Satisfaction": 0,
+        "Company Culture": 0,
+      },
+    },
+  ]);
+
+  // Constants
   const months = [
     "January",
     "February",
@@ -52,19 +52,16 @@ const AddExperience = () => {
     "November",
     "December",
   ];
-
   const employmentTypes = [
     "Full Time",
     "Part Time",
     "Remote",
     "Work From Home",
   ];
-
   const years = Array.from(
     { length: new Date().getFullYear() - 1999 },
     (_, i) => i + 2000
   );
-
   const countries = [
     "United States",
     "United Kingdom",
@@ -87,7 +84,6 @@ const AddExperience = () => {
     "South Korea",
     "New Zealand",
   ];
-
   const predefinedSkills = [
     "Design",
     "UI Designer",
@@ -95,85 +91,116 @@ const AddExperience = () => {
     "Critical Thinking",
     "Problem Solving",
   ];
-
   const policyOptions = ["Work from office", "Work from home", "Hybrid"];
+  const ratingCriteria = [
+    "Overall Rating",
+    "Work - Life Balance",
+    "Salary Benefits",
+    "Promotions & Appraisal",
+    "Job Security",
+    "Skill Development / Learning",
+    "Work Satisfaction",
+    "Company Culture",
+  ];
 
-  const addSkill = (skill) => {
-    if (skill.trim() !== "" && !keySkills.includes(skill)) {
-      setKeySkills([...keySkills, skill]);
-    }
+  // Add a new form
+  const addForm = () => {
+    const newForm = {
+      id: forms.length + 1,
+      selectedStartMonth: "",
+      selectedStartYear: "",
+      selectedEndMonth: "",
+      selectedEndYear: "",
+      companyName: "",
+      jobTitle: "",
+      employmentType: "",
+      selectedCountry: "",
+      keySkills: [],
+      policy: "",
+      currentlyWorking: "",
+      likeFeedback: "",
+      dislikeFeedback: "",
+      ratings: {
+        "Overall Rating": 0,
+        "Work - Life Balance": 0,
+        "Salary Benefits": 0,
+        "Promotions & Appraisal": 0,
+        "Job Security": 0,
+        "Skill Development / Learning": 0,
+        "Work Satisfaction": 0,
+        "Company Culture": 0,
+      },
+    };
+    setForms([...forms, newForm]);
   };
 
-  const removeSkill = (skill) => {
-    setKeySkills(keySkills.filter((s) => s !== skill));
+  // Remove a form
+  const removeForm = (id) => {
+    setForms(forms.filter((form) => form.id !== id));
   };
 
-  const handleRating = (criteria, star) => {
-    setRatings((prev) => ({
-      ...prev,
-      [criteria]: star,
-    }));
+  // Handle form field changes
+  const handleFormChange = (id, field, value) => {
+    setForms((prevForms) =>
+      prevForms.map((form) =>
+        form.id === id ? { ...form, [field]: value } : form
+      )
+    );
   };
 
-  const handleFeedback = (e) => {
-    if (e.target.value.length > 400) {
-      alert("Maximum character limit exceeded!");
-    }
+  // Handle rating changes
+  const handleRating = (id, criteria, star) => {
+    setForms((prevForms) =>
+      prevForms.map((form) =>
+        form.id === id
+          ? { ...form, ratings: { ...form.ratings, [criteria]: star } }
+          : form
+      )
+    );
   };
 
-  const handleFeedback1 = (e) => {
-    if (e.target.value.length > 400) {
-      alert("Maximum character limit exceeded!");
-    }
+  // Handle feedback changes
+  const handleFeedback = (id, field, value) => {
+    setForms((prevForms) =>
+      prevForms.map((form) =>
+        form.id === id ? { ...form, [field]: value } : form
+      )
+    );
   };
 
-  const handleAddExperience = () => {
-    if (isFormValid) {
-      setExperiences([...experiences, formData]);
-      setFormData({
-        companyName: "",
-        jobTitle: "",
-        employmentType: "",
-        selectedStartYear: "",
-      });
-    }
+  // Handle key skills changes
+  const addSkill = (id, skill) => {
+    setForms((prevForms) =>
+      prevForms.map((form) =>
+        form.id === id && !form.keySkills.includes(skill)
+          ? { ...form, keySkills: [...form.keySkills, skill] }
+          : form
+      )
+    );
   };
 
+  const removeSkill = (id, skill) => {
+    setForms((prevForms) =>
+      prevForms.map((form) =>
+        form.id === id
+          ? { ...form, keySkills: form.keySkills.filter((s) => s !== skill) }
+          : form
+      )
+    );
+  };
+
+  // Handle next button click
+  const handleNext = () => {
+    navigate("/step13", {
+      state: {
+        forms,
+      },
+    });
+  };
+
+  // Handle back button click
   const handleBack = () => {
     navigate(-1);
-  };
-
-  const handleNext = () => {
-    if (isFormValid) {
-      navigate("/step13", {
-        state: {
-          companyName,
-          jobTitle,
-          employmentType,
-          selectedStartMonth,
-          selectedStartYear,
-          selectedEndMonth,
-          selectedEndYear,
-          selectedCountry,
-          keySkills,
-          ratings,
-          likeFeedback,
-          dislikeFeedback,
-          policy,
-          currentlyWorking,
-        },
-      });
-    }
-  };
-
-  const isFormValid =
-    formData.companyName &&
-    formData.jobTitle &&
-    formData.employmentType &&
-    formData.selectedStartYear;
-
-  const handleSubmit = () => {
-    navigate("/step13", { state: { experiences } });
   };
 
   return (
@@ -209,336 +236,379 @@ const AddExperience = () => {
             right opportunities.
           </p>
 
-          <p className="font-bold text-[#05445E] mt-4">Company 1</p>
+          {/* Render Forms Dynamically */}
+          {forms.map((form) => (
+            <div key={form.id} className="mb-8">
+              <div className="flex justify-between items-center">
+                <p className="font-bold text-[#05445E] mt-4">
+                  Company {form.id}
+                </p>
+                {form.id > 1 && (
+                  <button
+                    onClick={() => removeForm(form.id)}
+                    className="text-red-600 hover:text-red-800"
+                  >
+                    <Minus size={16} />
+                  </button>
+                )}
+              </div>
 
-          {/* Start Date Section */}
-          <p className="font-bold text-[#05445E] mt-4">Start Date *</p>
-          <div className="flex gap-4 mt-2">
-            <select
-              className="border border-gray-300 rounded-md p-2 text-[#05445E]"
-              value={selectedStartMonth}
-              onChange={(e) => setSelectedStartMonth(e.target.value)}
-            >
-              <option value="">Select Month</option>
-              {months.map((month, index) => (
-                <option key={index} value={month}>
-                  {month}
-                </option>
-              ))}
-            </select>
-
-            <select
-              className="border border-gray-300 rounded-md p-2 text-[#05445E]"
-              value={selectedStartYear}
-              onChange={(e) => setSelectedStartYear(e.target.value)}
-            >
-              <option value="">Select Year</option>
-              {years.map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* End Date Section */}
-          <p className="font-bold text-[#05445E] mt-4">End Date *</p>
-          <div className="flex gap-4 mt-2">
-            <select
-              className="border border-gray-300 rounded-md p-2 text-[#05445E]"
-              value={selectedEndMonth}
-              onChange={(e) => setSelectedEndMonth(e.target.value)}
-            >
-              <option value="">Select Month</option>
-              {months.map((month, index) => (
-                <option key={index} value={month}>
-                  {month}
-                </option>
-              ))}
-            </select>
-
-            <select
-              className="border border-gray-300 rounded-md p-2 text-[#05445E]"
-              value={selectedEndYear}
-              onChange={(e) => setSelectedEndYear(e.target.value)}
-            >
-              <option value="">Select Year</option>
-              {years.map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Company Name Input */}
-          <p className="font-bold text-[#05445E] mt-4">Company Name *</p>
-          <input
-            type="text"
-            placeholder="Eg: Infosys"
-            className="border border-gray-300 rounded-md p-2 w-full mt-2 text-[#05445E]"
-            value={companyName}
-            onChange={(e) => setCompanyName(e.target.value)}
-          />
-
-          {/* Job Title Input */}
-          <label className="block font-bold mt-4">Title *</label>
-          <input
-            type="text"
-            value={formData.jobTitle}
-            onChange={(e) =>
-              setFormData({ ...formData, jobTitle: e.target.value })
-            }
-            className="border p-2 w-full rounded-md"
-          />
-
-          {/* Employment Type Dropdown */}
-          <p className="font-bold text-[#05445E] mt-4">Employment Type *</p>
-          <select
-            className="border border-gray-300 rounded-md p-2 w-full mt-2 text-[#05445E]"
-            value={employmentType}
-            onChange={(e) => setEmploymentType(e.target.value)}
-          >
-            <option value="">Select Employment Type</option>
-            {employmentTypes.map((type, index) => (
-              <option key={index} value={type}>
-                {type}
-              </option>
-            ))}
-          </select>
-
-          {/* Country Dropdown */}
-          <p className="font-bold text-[#05445E] mt-4">Country *</p>
-          <select
-            className="border border-gray-300 rounded-md p-2 w-full mt-2 text-[#05445E]"
-            value={selectedCountry}
-            onChange={(e) => setSelectedCountry(e.target.value)}
-          >
-            <option value="">Select Country</option>
-            {countries.map((country, index) => (
-              <option key={index} value={country}>
-                {country}
-              </option>
-            ))}
-          </select>
-
-          {/* Key Skills Section */}
-          <p className="font-bold text-[#05445E] mt-5">Key Skills *</p>
-
-          {/* Display Added Skills */}
-          <div className="border p-4 rounded-lg w-full mt-2 border-[#BEBEBE] flex flex-wrap gap-2 items-center">
-            {keySkills.map((skill, index) => (
-              <span
-                key={index}
-                className="bg-[#00A7AC] text-white px-3 py-1 rounded-lg flex items-center"
-              >
-                {skill}
-                <button
-                  onClick={() => removeSkill(skill)}
-                  className="ml-2 text-white font-bold"
+              {/* Start Date Section */}
+              <p className="font-bold text-[#05445E] mt-4">Start Date *</p>
+              <div className="flex gap-4 mt-2">
+                <select
+                  className="border border-gray-300 rounded-md p-2 text-[#05445E]"
+                  value={form.selectedStartMonth}
+                  onChange={(e) =>
+                    handleFormChange(
+                      form.id,
+                      "selectedStartMonth",
+                      e.target.value
+                    )
+                  }
                 >
-                  ×
-                </button>
-              </span>
-            ))}
-          </div>
+                  <option value="">Select Month</option>
+                  {months.map((month, index) => (
+                    <option key={index} value={month}>
+                      {month}
+                    </option>
+                  ))}
+                </select>
 
-          <div className="flex flex-wrap gap-2 mt-9">
-            {predefinedSkills.map((skill, index) => (
-              <button
-                key={index}
-                onClick={() => addSkill(skill)}
-                className="bg-gray-200 text-[#05445E] px-3 py-1 rounded-md hover:bg-[#00A7AC] hover:text-white transition"
+                <select
+                  className="border border-gray-300 rounded-md p-2 text-[#05445E]"
+                  value={form.selectedStartYear}
+                  onChange={(e) =>
+                    handleFormChange(
+                      form.id,
+                      "selectedStartYear",
+                      e.target.value
+                    )
+                  }
+                >
+                  <option value="">Select Year</option>
+                  {years.map((year) => (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* End Date Section */}
+              <p className="font-bold text-[#05445E] mt-4">End Date *</p>
+              <div className="flex gap-4 mt-2">
+                <select
+                  className="border border-gray-300 rounded-md p-2 text-[#05445E]"
+                  value={form.selectedEndMonth}
+                  onChange={(e) =>
+                    handleFormChange(
+                      form.id,
+                      "selectedEndMonth",
+                      e.target.value
+                    )
+                  }
+                >
+                  <option value="">Select Month</option>
+                  {months.map((month, index) => (
+                    <option key={index} value={month}>
+                      {month}
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  className="border border-gray-300 rounded-md p-2 text-[#05445E]"
+                  value={form.selectedEndYear}
+                  onChange={(e) =>
+                    handleFormChange(form.id, "selectedEndYear", e.target.value)
+                  }
+                >
+                  <option value="">Select Year</option>
+                  {years.map((year) => (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Company Name Input */}
+              <p className="font-bold text-[#05445E] mt-4">Company Name *</p>
+              <input
+                type="text"
+                placeholder="Eg: Infosys"
+                className="border border-gray-300 rounded-md p-2 w-full mt-2 text-[#05445E]"
+                value={form.companyName}
+                onChange={(e) =>
+                  handleFormChange(form.id, "companyName", e.target.value)
+                }
+              />
+
+              {/* Job Title Input */}
+              <p className="font-bold text-[#05445E] mt-4">Title *</p>
+              <input
+                type="text"
+                placeholder="Eg: Ex Senior UI/UX Designer"
+                className="border border-gray-300 rounded-md p-2 w-full mt-2 text-[#05445E]"
+                value={form.jobTitle}
+                onChange={(e) =>
+                  handleFormChange(form.id, "jobTitle", e.target.value)
+                }
+              />
+
+              {/* Employment Type Dropdown */}
+              <p className="font-bold text-[#05445E] mt-4">Employment Type *</p>
+              <select
+                className="border border-gray-300 rounded-md p-2 w-full mt-2 text-[#05445E]"
+                value={form.employmentType}
+                onChange={(e) =>
+                  handleFormChange(form.id, "employmentType", e.target.value)
+                }
               >
-                {skill}
-              </button>
-            ))}
-          </div>
+                <option value="">Select Employment Type</option>
+                {employmentTypes.map((type, index) => (
+                  <option key={index} value={type}>
+                    {type}
+                  </option>
+                ))}
+              </select>
 
-          {/* University Experience Rating */}
-          <div className="mt-10 ">
-            <p className="text-[#05445E] text-xl font-bold mb-2">
-              Rate the Company on the following criteria
-            </p>
-            {Object.keys(ratings).map((criteria, index) => (
-              <div key={index} className="mb-6 mt-4">
-                <label className="block text-[#05445E] font-bold">
-                  {criteria} <span className="text-red-700">*</span>
-                </label>
-                <div className="flex gap-10 mt-3 ">
-                  {[1, 2, 3, 4, 5].map((star) => (
+              {/* Country Dropdown */}
+              <p className="font-bold text-[#05445E] mt-4">Country *</p>
+              <select
+                className="border border-gray-300 rounded-md p-2 w-full mt-2 text-[#05445E]"
+                value={form.selectedCountry}
+                onChange={(e) =>
+                  handleFormChange(form.id, "selectedCountry", e.target.value)
+                }
+              >
+                <option value="">Select Country</option>
+                {countries.map((country, index) => (
+                  <option key={index} value={country}>
+                    {country}
+                  </option>
+                ))}
+              </select>
+
+              {/* Key Skills Section */}
+              <p className="font-bold text-[#05445E] mt-5">Key Skills *</p>
+              <div className="border p-4 rounded-lg w-full mt-2 border-[#BEBEBE] flex flex-wrap gap-2 items-center">
+                {form.keySkills.map((skill, index) => (
+                  <span
+                    key={index}
+                    className="bg-[#00A7AC] text-white px-3 py-1 rounded-lg flex items-center"
+                  >
+                    {skill}
                     <button
-                      key={star}
-                      type="button"
-                      onClick={() => handleRating(criteria, star)}
-                      className="focus:outline-none"
+                      onClick={() => removeSkill(form.id, skill)}
+                      className="ml-2 text-white font-bold"
                     >
-                      <Star
-                        className={`w-9 h-9 ${
-                          star <= ratings[criteria]
-                            ? "fill-[#00A7AC] text-[#00A7AC]"
-                            : "text-gray-300"
-                        }`}
-                      />
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+              <div className="flex flex-wrap gap-2 mt-9">
+                {predefinedSkills.map((skill, index) => (
+                  <button
+                    key={index}
+                    onClick={() => addSkill(form.id, skill)}
+                    className="bg-gray-200 text-[#05445E] px-3 py-1 rounded-md hover:bg-[#00A7AC] hover:text-white transition"
+                  >
+                    {skill}
+                  </button>
+                ))}
+              </div>
+
+              {/* University Experience Rating */}
+              <div className="mt-10">
+                <p className="text-[#05445E] text-xl font-bold mb-2">
+                  Rate the Company on the following criteria
+                </p>
+                {ratingCriteria.map((criteria, index) => (
+                  <div key={index} className="mb-6 mt-4">
+                    <label className="block text-[#05445E] font-bold">
+                      {criteria} <span className="text-red-700">*</span>
+                    </label>
+                    <div className="flex gap-10 mt-3">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          onClick={() => handleRating(form.id, criteria, star)}
+                          className="focus:outline-none"
+                        >
+                          <Star
+                            className={`w-9 h-9 ${
+                              star <= form.ratings[criteria]
+                                ? "fill-[#00A7AC] text-[#00A7AC]"
+                                : "text-gray-300"
+                            }`}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Feedback Sections */}
+              <p className="text-[#05445E] font-semibold">
+                What do you like about working at your Company?
+                <span className="text-red-600">*</span>
+                <textarea
+                  value={form.likeFeedback}
+                  onChange={(e) =>
+                    handleFeedback(form.id, "likeFeedback", e.target.value)
+                  }
+                  placeholder="e.g. I was a software engineer at Google"
+                  className="border p-2 w-full rounded-lg mt-2 border-[#BEBEBE] resize-none"
+                  rows={4}
+                />
+              </p>
+              <p className="text-[#05445E] font-semibold">
+                What do you dislike about working at your Company?
+                <span className="text-red-600">*</span>
+                <textarea
+                  value={form.dislikeFeedback}
+                  onChange={(e) =>
+                    handleFeedback(form.id, "dislikeFeedback", e.target.value)
+                  }
+                  placeholder="e.g. I was a software engineer at Google"
+                  className="border p-2 w-full rounded-lg mt-2 border-[#BEBEBE] resize-none"
+                  rows={4}
+                />
+              </p>
+
+              {/* Work Policy Section */}
+              <div className="w-full text-left">
+                <p className="font-bold text-[#05445E] mt-6">
+                  What is the work Policy at your Company?
+                  <span className="text-red-700">*</span>
+                </p>
+                <div className="flex gap-4 mt-3">
+                  {policyOptions.map((option, index) => (
+                    <button
+                      key={index}
+                      onClick={() =>
+                        handleFormChange(form.id, "policy", option)
+                      }
+                      className={`px-3 border rounded-lg transition ${
+                        form.policy === option
+                          ? "bg-white text-[#05445E]"
+                          : "bg-white text-[#00A7AC] border-gray-400"
+                      }`}
+                    >
+                      {option}
                     </button>
                   ))}
                 </div>
               </div>
-            ))}
-          </div>
 
-          <p className="text-[#05445E] font-semibold ">
-            What do you like about working at your Company?
-            <span className="text-red-600">*</span>
-            <textarea
-              value={likeFeedback}
-              onChange={(e) => setLikeFeedback(e.target.value)}
-              onKeyDown={handleFeedback}
-              placeholder="e.g. I was a software engineer at Google"
-              className="border p-2 w-full rounded-lg mt-2 border-[#BEBEBE] resize-none"
-              rows={4}
-            />
-          </p>
+              {/* Currently Working Section */}
+              <p className="font-bold text-[#05445E] mt-4">
+                Do you currently work here?{" "}
+                <span className="text-red-700">*</span>
+              </p>
+              <div className="flex gap-6 mt-2">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name={`currentlyWorking-${form.id}`}
+                    value="yes"
+                    checked={form.currentlyWorking === "yes"}
+                    onChange={() =>
+                      handleFormChange(form.id, "currentlyWorking", "yes")
+                    }
+                    className="hidden"
+                  />
+                  <div
+                    className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                      form.currentlyWorking === "yes"
+                        ? "border-[#00A7AC]"
+                        : "border-gray-400"
+                    }`}
+                  >
+                    {form.currentlyWorking === "yes" && (
+                      <div className="w-3 h-3 bg-[#00A7AC] rounded-full"></div>
+                    )}
+                  </div>
+                  <span className="text-[#05445E] font-semibold">Yes</span>
+                </label>
 
-          <p className="text-[#05445E] font-semibold ">
-            What do you dislike about working at your Company?
-            <span className="text-red-600">*</span>
-            <textarea
-              value={dislikeFeedback}
-              onChange={(e) => setDislikeFeedback(e.target.value)}
-              onKeyDown={handleFeedback1}
-              placeholder="e.g. I was a software engineer at Google"
-              className="border p-2 w-full rounded-lg mt-2 border-[#BEBEBE] resize-none"
-              rows={4}
-            />
-          </p>
-
-          <div className="w-full text-left">
-            <p className="font-bold text-[#05445E] mt-6">
-              What is the work Policy at your Company?
-              <span className="text-red-700">*</span>
-            </p>
-            <div className="flex gap-4 mt-3 ">
-              {policyOptions.map((option, index) => (
-                <button
-                  key={index}
-                  onClick={() => setPolicy(option)}
-                  className={`px-3 border rounded-lg transition ${
-                    policy === option
-                      ? "bg-white text-[#05445E]"
-                      : "bg-white text-[#00A7AC] border-gray-400"
-                  }`}
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <p className="font-bold text-[#05445E] mt-4">
-            Do you currently work here? <span className="text-red-700">*</span>
-          </p>
-          <div className="flex gap-6 mt-2">
-            {/* Yes Option */}
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="radio"
-                name="currentlyWorking"
-                value="yes"
-                checked={currentlyWorking === "yes"}
-                onChange={() => setCurrentlyWorking("yes")}
-                className="hidden"
-              />
-              <div
-                className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                  currentlyWorking === "yes"
-                    ? "border-[#00A7AC]"
-                    : "border-gray-400"
-                }`}
-              >
-                {currentlyWorking === "yes" && (
-                  <div className="w-3 h-3 bg-[#00A7AC] rounded-full"></div>
-                )}
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name={`currentlyWorking-${form.id}`}
+                    value="no"
+                    checked={form.currentlyWorking === "no"}
+                    onChange={() =>
+                      handleFormChange(form.id, "currentlyWorking", "no")
+                    }
+                    className="hidden"
+                  />
+                  <div
+                    className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                      form.currentlyWorking === "no"
+                        ? "border-[#00A7AC]"
+                        : "border-gray-400"
+                    }`}
+                  >
+                    {form.currentlyWorking === "no" && (
+                      <div className="w-3 h-3 bg-[#00A7AC] rounded-full"></div>
+                    )}
+                  </div>
+                  <span className="text-[#05445E] font-semibold">No</span>
+                </label>
               </div>
-              <span className="text-[#05445E] font-semibold">Yes</span>
-            </label>
-
-            {/* No Option */}
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="radio"
-                name="currentlyWorking"
-                value="no"
-                checked={currentlyWorking === "no"}
-                onChange={() => setCurrentlyWorking("no")}
-                className="hidden"
-              />
-              <div
-                className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                  currentlyWorking === "no"
-                    ? "border-[#00A7AC]"
-                    : "border-gray-400"
-                }`}
-              >
-                {currentlyWorking === "no" && (
-                  <div className="w-3 h-3 bg-[#00A7AC] rounded-full"></div>
-                )}
-              </div>
-              <span className="text-[#05445E] font-semibold">No</span>
-            </label>
-          </div>
-
-          <div className="relative min-h-screen flex flex-col p-4">
-            <h1 className="text-2xl font-bold text-[#05445E]">
-              Add Experience
-            </h1>
-            {experiences.map((exp, index) => (
-              <div
-                key={index}
-                className="border p-4 mt-4 rounded-lg bg-gray-100"
-              >
-                <p className="font-bold">
-                  Company {index + 1}: {exp.companyName}
-                </p>
-              </div>
-            ))}
-            <div className="mt-4 p-4 border rounded-lg">
-              <label className="block font-bold">Company Name *</label>
-              <input
-                type="text"
-                value={formData.companyName}
-                onChange={(e) =>
-                  setFormData({ ...formData, companyName: e.target.value })
-                }
-                className="border p-2 w-full rounded-md"
-              />
-
-              <button
-                onClick={handleAddExperience}
-                className="mt-4 px-4 py-2 bg-[#00A7AC] text-white rounded-md flex items-center gap-2"
-              >
-                <Plus size={16} /> Add Experience
-              </button>
             </div>
+          ))}
 
-            <div className="mt-8 flex justify-between gap-8">
-              <button
-                onClick={handleBack}
-                className="w-40 py-2 bg-white border  text-[#05445E] font-semibold rounded-lg shadow-lg hover:opacity-90 transition"
-              >
-                Back
-              </button>
+          {/* Add Experience Button */}
+          <button
+            onClick={addForm}
+            className="mt-8 flex items-center gap-2 px-4 py-2 border rounded-lg bg-[#00A7AC] text-white hover:bg-gray-400 transition"
+          >
+            <Plus size={16} /> Add Experience
+          </button>
 
-              <button
-                onClick={handleSubmit}
-                className={`mt-6 px-6 py-2 bg-blue-600 text-white rounded-md ${
-                  experiences.length > 0 ? "" : "opacity-50 cursor-not-allowed"
-                }`}
-                disabled={experiences.length === 0}
-              >
-                Submit
-              </button>
-            </div>
+          {/* Navigation Buttons */}
+          <div className="mt-8 flex justify-between gap-8">
+            <button
+              onClick={handleBack}
+              className="w-40 py-2 bg-white border text-[#05445E] font-semibold rounded-lg shadow-lg hover:opacity-90 transition"
+            >
+              Back
+            </button>
+            <button
+              onClick={handleNext}
+              className={`w-40 py-2 text-white font-semibold rounded-lg shadow-lg transition ${
+                forms.every(
+                  (form) =>
+                    form.companyName &&
+                    form.jobTitle &&
+                    form.employmentType &&
+                    form.selectedStartYear
+                )
+                  ? "hover:opacity-90"
+                  : "opacity-50 cursor-not-allowed"
+              }`}
+              style={{
+                background: "linear-gradient(90deg, #05445E 0%, #00A7AC 100%)",
+              }}
+              disabled={
+                !forms.every(
+                  (form) =>
+                    form.companyName &&
+                    form.jobTitle &&
+                    form.employmentType &&
+                    form.selectedStartYear
+                )
+              }
+            >
+              Submit
+            </button>
           </div>
         </div>
       </div>
