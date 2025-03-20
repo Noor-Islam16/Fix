@@ -1,6 +1,9 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import ellipseImage from "../assets/images/Ellipse 34.jpg";
 import vectorImage from "../assets/images/Vector 60.jpg";
+import { Star, Plus } from "lucide-react";
 
 const AddExperience = () => {
   const [selectedStartMonth, setSelectedStartMonth] = useState("");
@@ -11,8 +14,29 @@ const AddExperience = () => {
   const [jobTitle, setJobTitle] = useState("");
   const [employmentType, setEmploymentType] = useState("");
   const [selectedCountry, setSelectedCountry] = useState("");
-  const [skillInput, setSkillInput] = useState("");
   const [keySkills, setKeySkills] = useState([]);
+  const [policy, setPolicy] = useState("");
+  const [currentlyWorking, setCurrentlyWorking] = useState("");
+  const [likeFeedback, setLikeFeedback] = useState("");
+  const [dislikeFeedback, setDislikeFeedback] = useState("");
+  const [experiences, setExperiences] = useState([]);
+  const [formData, setFormData] = useState({
+    companyName: "",
+    jobTitle: "",
+    employmentType: "",
+    selectedStartYear: "",
+  });
+  const navigate = useNavigate();
+  const [ratings, setRatings] = useState({
+    "Overall Rating": 0,
+    "Work - Life Balance": 0,
+    "Salary Benefits": 0,
+    "Promotions & Appraisal": 0,
+    "Job Security": 0,
+    "Skill Development / Learning": 0,
+    "Work Satisfaction": 0,
+    "Company Culture": 0,
+  });
 
   const months = [
     "January",
@@ -36,11 +60,10 @@ const AddExperience = () => {
     "Work From Home",
   ];
 
-  const years = [];
-  const currentYear = new Date().getFullYear();
-  for (let year = 2000; year <= currentYear; year++) {
-    years.push(year);
-  }
+  const years = Array.from(
+    { length: new Date().getFullYear() - 1999 },
+    (_, i) => i + 2000
+  );
 
   const countries = [
     "United States",
@@ -65,15 +88,92 @@ const AddExperience = () => {
     "New Zealand",
   ];
 
-  const addSkill = () => {
-    if (skillInput.trim() !== "") {
-      setKeySkills([...keySkills, skillInput.trim()]);
-      setSkillInput("");
+  const predefinedSkills = [
+    "Design",
+    "UI Designer",
+    "UX Designer",
+    "Critical Thinking",
+    "Problem Solving",
+  ];
+
+  const policyOptions = ["Work from office", "Work from home", "Hybrid"];
+
+  const addSkill = (skill) => {
+    if (skill.trim() !== "" && !keySkills.includes(skill)) {
+      setKeySkills([...keySkills, skill]);
     }
   };
 
   const removeSkill = (skill) => {
     setKeySkills(keySkills.filter((s) => s !== skill));
+  };
+
+  const handleRating = (criteria, star) => {
+    setRatings((prev) => ({
+      ...prev,
+      [criteria]: star,
+    }));
+  };
+
+  const handleFeedback = (e) => {
+    if (e.target.value.length > 400) {
+      alert("Maximum character limit exceeded!");
+    }
+  };
+
+  const handleFeedback1 = (e) => {
+    if (e.target.value.length > 400) {
+      alert("Maximum character limit exceeded!");
+    }
+  };
+
+  const handleAddExperience = () => {
+    if (isFormValid) {
+      setExperiences([...experiences, formData]);
+      setFormData({
+        companyName: "",
+        jobTitle: "",
+        employmentType: "",
+        selectedStartYear: "",
+      });
+    }
+  };
+
+  const handleBack = () => {
+    navigate(-1);
+  };
+
+  const handleNext = () => {
+    if (isFormValid) {
+      navigate("/step13", {
+        state: {
+          companyName,
+          jobTitle,
+          employmentType,
+          selectedStartMonth,
+          selectedStartYear,
+          selectedEndMonth,
+          selectedEndYear,
+          selectedCountry,
+          keySkills,
+          ratings,
+          likeFeedback,
+          dislikeFeedback,
+          policy,
+          currentlyWorking,
+        },
+      });
+    }
+  };
+
+  const isFormValid =
+    formData.companyName &&
+    formData.jobTitle &&
+    formData.employmentType &&
+    formData.selectedStartYear;
+
+  const handleSubmit = () => {
+    navigate("/step13", { state: { experiences } });
   };
 
   return (
@@ -133,8 +233,8 @@ const AddExperience = () => {
               onChange={(e) => setSelectedStartYear(e.target.value)}
             >
               <option value="">Select Year</option>
-              {years.map((year, index) => (
-                <option key={index} value={year}>
+              {years.map((year) => (
+                <option key={year} value={year}>
                   {year}
                 </option>
               ))}
@@ -163,15 +263,15 @@ const AddExperience = () => {
               onChange={(e) => setSelectedEndYear(e.target.value)}
             >
               <option value="">Select Year</option>
-              {years.map((year, index) => (
-                <option key={index} value={year}>
+              {years.map((year) => (
+                <option key={year} value={year}>
                   {year}
                 </option>
               ))}
             </select>
           </div>
 
-          {/* Company Name Input - Moved to the End */}
+          {/* Company Name Input */}
           <p className="font-bold text-[#05445E] mt-4">Company Name *</p>
           <input
             type="text"
@@ -181,17 +281,18 @@ const AddExperience = () => {
             onChange={(e) => setCompanyName(e.target.value)}
           />
 
-          {/* Job Title Input - Added at the Last */}
-          <p className="font-bold text-[#05445E] mt-4">Title *</p>
+          {/* Job Title Input */}
+          <label className="block font-bold mt-4">Title *</label>
           <input
             type="text"
-            placeholder="Eg: Ex Senior UI/UX Designer"
-            className="border border-gray-300 rounded-md p-2 w-full mt-2 text-[#05445E]"
-            value={jobTitle}
-            onChange={(e) => setJobTitle(e.target.value)}
+            value={formData.jobTitle}
+            onChange={(e) =>
+              setFormData({ ...formData, jobTitle: e.target.value })
+            }
+            className="border p-2 w-full rounded-md"
           />
 
-          {/* Employment Type Dropdown - Added at the Last */}
+          {/* Employment Type Dropdown */}
           <p className="font-bold text-[#05445E] mt-4">Employment Type *</p>
           <select
             className="border border-gray-300 rounded-md p-2 w-full mt-2 text-[#05445E]"
@@ -206,7 +307,7 @@ const AddExperience = () => {
             ))}
           </select>
 
-          {/* Country Dropdown - Added at the Last */}
+          {/* Country Dropdown */}
           <p className="font-bold text-[#05445E] mt-4">Country *</p>
           <select
             className="border border-gray-300 rounded-md p-2 w-full mt-2 text-[#05445E]"
@@ -222,8 +323,10 @@ const AddExperience = () => {
           </select>
 
           {/* Key Skills Section */}
-          <p className="font-bold text-[#05445E] mt-4">Key Skills *</p>
-          <div className="border p-2 rounded-lg w-full mt-2 border-[#BEBEBE] flex flex-wrap gap-2 items-center">
+          <p className="font-bold text-[#05445E] mt-5">Key Skills *</p>
+
+          {/* Display Added Skills */}
+          <div className="border p-4 rounded-lg w-full mt-2 border-[#BEBEBE] flex flex-wrap gap-2 items-center">
             {keySkills.map((skill, index) => (
               <span
                 key={index}
@@ -240,21 +343,202 @@ const AddExperience = () => {
             ))}
           </div>
 
-          {/* Input to Add New Skill */}
-          <div className="flex gap-2 mt-3">
-            <input
-              type="text"
-              placeholder="Add a skill"
-              className="border border-gray-300 rounded-md p-2 w-full text-[#05445E]"
-              value={skillInput}
-              onChange={(e) => setSkillInput(e.target.value)}
+          <div className="flex flex-wrap gap-2 mt-9">
+            {predefinedSkills.map((skill, index) => (
+              <button
+                key={index}
+                onClick={() => addSkill(skill)}
+                className="bg-gray-200 text-[#05445E] px-3 py-1 rounded-md hover:bg-[#00A7AC] hover:text-white transition"
+              >
+                {skill}
+              </button>
+            ))}
+          </div>
+
+          {/* University Experience Rating */}
+          <div className="mt-10 ">
+            <p className="text-[#05445E] text-xl font-bold mb-2">
+              Rate the Company on the following criteria
+            </p>
+            {Object.keys(ratings).map((criteria, index) => (
+              <div key={index} className="mb-6 mt-4">
+                <label className="block text-[#05445E] font-bold">
+                  {criteria} <span className="text-red-700">*</span>
+                </label>
+                <div className="flex gap-10 mt-3 ">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => handleRating(criteria, star)}
+                      className="focus:outline-none"
+                    >
+                      <Star
+                        className={`w-9 h-9 ${
+                          star <= ratings[criteria]
+                            ? "fill-[#00A7AC] text-[#00A7AC]"
+                            : "text-gray-300"
+                        }`}
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <p className="text-[#05445E] font-semibold ">
+            What do you like about working at your Company?
+            <span className="text-red-600">*</span>
+            <textarea
+              value={likeFeedback}
+              onChange={(e) => setLikeFeedback(e.target.value)}
+              onKeyDown={handleFeedback}
+              placeholder="e.g. I was a software engineer at Google"
+              className="border p-2 w-full rounded-lg mt-2 border-[#BEBEBE] resize-none"
+              rows={4}
             />
-            <button
-              onClick={addSkill}
-              className="bg-[#00A7AC] text-white px-4 py-2 rounded-md"
-            >
-              Add
-            </button>
+          </p>
+
+          <p className="text-[#05445E] font-semibold ">
+            What do you dislike about working at your Company?
+            <span className="text-red-600">*</span>
+            <textarea
+              value={dislikeFeedback}
+              onChange={(e) => setDislikeFeedback(e.target.value)}
+              onKeyDown={handleFeedback1}
+              placeholder="e.g. I was a software engineer at Google"
+              className="border p-2 w-full rounded-lg mt-2 border-[#BEBEBE] resize-none"
+              rows={4}
+            />
+          </p>
+
+          <div className="w-full text-left">
+            <p className="font-bold text-[#05445E] mt-6">
+              What is the work Policy at your Company?
+              <span className="text-red-700">*</span>
+            </p>
+            <div className="flex gap-4 mt-3 ">
+              {policyOptions.map((option, index) => (
+                <button
+                  key={index}
+                  onClick={() => setPolicy(option)}
+                  className={`px-3 border rounded-lg transition ${
+                    policy === option
+                      ? "bg-white text-[#05445E]"
+                      : "bg-white text-[#00A7AC] border-gray-400"
+                  }`}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <p className="font-bold text-[#05445E] mt-4">
+            Do you currently work here? <span className="text-red-700">*</span>
+          </p>
+          <div className="flex gap-6 mt-2">
+            {/* Yes Option */}
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="currentlyWorking"
+                value="yes"
+                checked={currentlyWorking === "yes"}
+                onChange={() => setCurrentlyWorking("yes")}
+                className="hidden"
+              />
+              <div
+                className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                  currentlyWorking === "yes"
+                    ? "border-[#00A7AC]"
+                    : "border-gray-400"
+                }`}
+              >
+                {currentlyWorking === "yes" && (
+                  <div className="w-3 h-3 bg-[#00A7AC] rounded-full"></div>
+                )}
+              </div>
+              <span className="text-[#05445E] font-semibold">Yes</span>
+            </label>
+
+            {/* No Option */}
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="currentlyWorking"
+                value="no"
+                checked={currentlyWorking === "no"}
+                onChange={() => setCurrentlyWorking("no")}
+                className="hidden"
+              />
+              <div
+                className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                  currentlyWorking === "no"
+                    ? "border-[#00A7AC]"
+                    : "border-gray-400"
+                }`}
+              >
+                {currentlyWorking === "no" && (
+                  <div className="w-3 h-3 bg-[#00A7AC] rounded-full"></div>
+                )}
+              </div>
+              <span className="text-[#05445E] font-semibold">No</span>
+            </label>
+          </div>
+
+          <div className="relative min-h-screen flex flex-col p-4">
+            <h1 className="text-2xl font-bold text-[#05445E]">
+              Add Experience
+            </h1>
+            {experiences.map((exp, index) => (
+              <div
+                key={index}
+                className="border p-4 mt-4 rounded-lg bg-gray-100"
+              >
+                <p className="font-bold">
+                  Company {index + 1}: {exp.companyName}
+                </p>
+              </div>
+            ))}
+            <div className="mt-4 p-4 border rounded-lg">
+              <label className="block font-bold">Company Name *</label>
+              <input
+                type="text"
+                value={formData.companyName}
+                onChange={(e) =>
+                  setFormData({ ...formData, companyName: e.target.value })
+                }
+                className="border p-2 w-full rounded-md"
+              />
+
+              <button
+                onClick={handleAddExperience}
+                className="mt-4 px-4 py-2 bg-[#00A7AC] text-white rounded-md flex items-center gap-2"
+              >
+                <Plus size={16} /> Add Experience
+              </button>
+            </div>
+
+            <div className="mt-8 flex justify-between gap-8">
+              <button
+                onClick={handleBack}
+                className="w-40 py-2 bg-white border  text-[#05445E] font-semibold rounded-lg shadow-lg hover:opacity-90 transition"
+              >
+                Back
+              </button>
+
+              <button
+                onClick={handleSubmit}
+                className={`mt-6 px-6 py-2 bg-blue-600 text-white rounded-md ${
+                  experiences.length > 0 ? "" : "opacity-50 cursor-not-allowed"
+                }`}
+                disabled={experiences.length === 0}
+              >
+                Submit
+              </button>
+            </div>
           </div>
         </div>
       </div>
