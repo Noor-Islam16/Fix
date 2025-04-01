@@ -13,6 +13,7 @@ const Job = () => {
   const [minValue, setMinValue] = useState(0);
   const [maxValue, setMaxValue] = useState(0);
   const [selectedOptions, setSelectedOptions] = useState([]);
+  const [sortFilter, setSortFilter] = useState("Newest Post"); // Added this state
 
   const options = [
     "Full-time",
@@ -221,7 +222,7 @@ const Job = () => {
                   <div
                     key={option}
                     className="flex items-center gap-2 cursor-pointer p-2 rounded-md hover:bg-gray-100"
-                    onClick={() => toggleOption(option, setSelectedOptions)}
+                    onClick={() => toggleOption(option)}
                   >
                     {selectedOptions.includes(option) ? (
                       <CheckSquare className="text-blue-600" />
@@ -380,6 +381,36 @@ const Job = () => {
 
           {/* Right Side - Job Cards */}
           <div className="w-3/4">
+            <div className="flex justify-between items-center mb-4">
+              <h1 className="text-xl font-bold text-gray-800">
+                Showing 1-{jobCards.length} Jobs of 40,780
+              </h1>
+              <div className="relative group">
+                <div className="flex items-center space-x-2 text-gray-600 text-sm cursor-pointer">
+                  <span>Sort by</span>
+                  <span>{sortFilter}</span>
+                  <ChevronDown size={20} />
+                </div>
+                <div className="hidden group-hover:block absolute mt-2 w-48 bg-white text-black shadow-lg rounded-lg max-h-60 overflow-y-auto">
+                  <ul>
+                    {[
+                      "Newest Post",
+                      "Past 5 Days",
+                      "Past 15 Days",
+                      "Past 30 Days",
+                    ].map((option) => (
+                      <li
+                        key={option}
+                        className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
+                        onClick={() => setSortFilter(option)}
+                      >
+                        {option}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {jobCards.map((job) => (
                 <div
